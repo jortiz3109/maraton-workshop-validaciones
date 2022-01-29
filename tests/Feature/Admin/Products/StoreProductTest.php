@@ -2,8 +2,13 @@
 
 namespace Tests\Feature\Admin\Products;
 
+use App\Models\Image;
+use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Http\Testing\File;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
@@ -18,7 +23,34 @@ class StoreProductTest extends TestCase
         $response = $this->post('/admin/products', $data);
 
         $response->assertRedirect();
-        $this->assertDatabaseHas('products', $data);
+        $this->assertDatabaseHas('products', Arr::except($data, ['images']));
+    }
+
+    public function test_it_stores_images_in_filesystem(): void
+    {
+        Storage::fake(config('filesystems.images_disk'));
+
+        $data = $this->productData();
+        $this->post('/admin/products', $data);
+
+        $image = Image::first();
+
+        Storage::disk(config('filesystems.images_disk'))->assertExists("{$image->product_id}/{$image->file_name}");
+
+    }
+
+    private function productData(): array
+    {
+        return [
+            'code' => 'PRD1234567',
+            'name' => 'Test product',
+            'price' => 100,
+            'quantity' => 5,
+            'description' => 'Amazing test product',
+            'images' => [
+                UploadedFile::fake()->image('product.jpg', 500, 250)->size(50),
+            ]
+        ];
     }
 
     /**
@@ -142,17 +174,60 @@ class StoreProductTest extends TestCase
                 ),
                 'field' => 'description'
             ],
-        ];
-    }
-
-    private function productData(): array
-    {
-        return [
-            'code' => 'PRD1234567',
-            'name' => 'Test product',
-            'price' => 100,
-            'quantity' => 5,
-            'description' => 'Amazing test product'
+            'validate rule images array' => [
+                'data' => array_replace($this->productData(), ['images' => '']),
+                'field' => 'images'
+            ],
+            'validate rule images image' => [
+                'data' => array_replace
+                ($this->productData(),
+                    [
+                        'images' => [
+                            UploadedFile::fake()->create('document.pdf', 100, 'application/pdf')
+                        ]
+                    ]),
+                'field' => 'images.0'
+            ],
+            'validate rule images max:200' => [
+                'data' => array_replace
+                ($this->productData(),
+                    [
+                        'images' => [
+                            UploadedFile::fake()->image('product.jpg')->size(201),
+                        ]
+                    ]),
+                'field' => 'images.0'
+            ],
+            'validate rule images max_width:500' => [
+                'data' => array_replace
+                ($this->productData(),
+                    [
+                        'images' => [
+                            UploadedFile::fake()->image('product.jpg', 501)->size(150),
+                        ]
+                    ]),
+                'field' => 'images.0'
+            ],
+            'validate rule images max_height:250' => [
+                'data' => array_replace
+                ($this->productData(),
+                    [
+                        'images' => [
+                            UploadedFile::fake()->image('product.jpg', 500, 251)->size(150),
+                        ]
+                    ]),
+                'field' => 'images.0'
+            ],
+            'validate rule images ratio:2/1' => [
+                'data' => array_replace
+                ($this->productData(),
+                    [
+                        'images' => [
+                            UploadedFile::fake()->image('product.jpg', 500, 240)->size(150),
+                        ]
+                    ]),
+                'field' => 'images.0'
+            ]
         ];
     }
 }

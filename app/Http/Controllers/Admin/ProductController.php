@@ -2,20 +2,21 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Actions\StoreProductImagesAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Products\StoreProductRequest;
 use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class ProductController extends Controller
 {
     public function index(): View
     {
-        $products = Product::select(['id', 'name', 'price', 'quantity', 'disabled_at'])->paginate();
+        $products = Product::select(['id', 'name', 'price', 'quantity', 'disabled_at'])->withCount('images')->paginate();
         return view('admin.products.index', compact('products'));
     }
 
@@ -24,7 +25,7 @@ class ProductController extends Controller
         return view('admin.products.create');
     }
 
-    public function store(StoreProductRequest $request): RedirectResponse
+    public function store(StoreProductRequest $request, StoreProductImagesAction $imagesAction): RedirectResponse
     {
         /**
          * OPCIÓN 1 - USANDO EL MÉTODO VALIDATE DEL OBJETO Request
@@ -34,7 +35,7 @@ class ProductController extends Controller
          * 'price' => ['required', 'integer', 'min:1'],
          * 'quantity' => ['required', 'integer', 'min:0'],
          * 'description' => ['required', 'min:10', 'max:250'],
-        ]);
+         * ]);
          */
 
         /**
@@ -49,7 +50,6 @@ class ProductController extends Controller
          *     'required' => 'Venga!! el :attribute es necesario para esta operación',
          *     'min' => 'No seas así!!!! dame un valor mínimo para este campo :attribute de :min'
          * ]);
-
          * if ($validator->fails()) {
          *     return redirect()->back()->withErrors($validator->errors())->withInput();
          * }
@@ -65,18 +65,14 @@ class ProductController extends Controller
 
         $product->save();
 
+        $imagesAction->execute($request->images, $product);
+
         return redirect(route('admin.products.show', $product));
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param int $id
-     * @return Response
-     */
-    public function show($id)
+    public function show(Product $product): View
     {
-        //
+        return view('admin.products.show', compact('product'));
     }
 
     /**

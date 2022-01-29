@@ -29,5 +29,6 @@ class CreateProductTest extends TestCase
         $response->assertSee(trans('admin.products.fields.name'));
         $response->assertSee(trans('admin.products.fields.price'));
         $response->assertSee(trans('admin.products.fields.quantity'));
+        $response->assertSee(trans('admin.products.fields.images'));
     }
 }
