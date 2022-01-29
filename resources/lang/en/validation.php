@@ -141,8 +141,8 @@ return [
     */
 
     'custom' => [
-        'attribute-name' => [
-            'rule-name' => 'custom-message',
+        'name' => [
+            'required' => 'Por dios!!! dame un valor para el campo :attribute',
         ],
     ],
 
@@ -157,6 +157,8 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'name' => 'Nombre de producto'
+    ],
 
 ];
