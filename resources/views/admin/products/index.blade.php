@@ -13,16 +13,20 @@
                         <th scope="col">{{ trans('admin.products.fields.name') }}</th>
                         <th scope="col">{{ trans('admin.products.fields.price') }}</th>
                         <th scope="col">{{ trans('admin.products.fields.quantity') }}</th>
-                        <th scope="col">{{ trans('admin.products.fields.status') }}</th>
+                        <th scope="col">{{ trans('admin.products.fields.images') }}</th>
                     </tr>
                     </thead>
                     <tbody>
                     @foreach($products as $product)
                         <tr>
-                            <td>{{ $product->name }}</td>
+                            <td>
+                                <a href="{{ route('admin.products.show', $product) }}">
+                                    {{ $product->name }}
+                                </a>
+                            </td>
                             <td>{{ $product->price }}</td>
                             <td>{{ $product->quantity }}</td>
-                            <td>{{ $product->disabled_at }}</td>
+                            <td>{{ $product->images_count }}</td>
                         </tr>
                     @endforeach
                     </tbody>
