@@ -10,6 +10,8 @@ class Image extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['file_name'];
+
     public function url(): string
     {
         return Storage::disk(config('filesystems.images_disk'))->url("{$this->product_id}/{$this->file_name}");

@@ -1,7 +1,8 @@
 <template>
     <div class="card-body">
         <div class="mb-3" v-for="field in fields" :key="field">
-            <input type="file" class="form-control" :name="inputFieldName()" required>
+            <input type="file" :class="cssClasses()" :name="inputFieldName()" required>
+            <slot></slot>
         </div>
     </div>
 </template>
@@ -19,6 +20,10 @@ export default {
         maxImages: {
             type: Number,
             default: 5
+        },
+        cssClass: {
+            type: String,
+            default: ''
         }
     },
     methods: {
@@ -37,6 +42,9 @@ export default {
         },
         inputFieldName() {
             return this.fieldName.concat('[]');
+        },
+        cssClasses() {
+            return "form-control ".concat(this.cssClass).trim();
         }
     },
     mounted() {
