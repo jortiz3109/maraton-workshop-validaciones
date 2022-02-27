@@ -14,7 +14,7 @@ class ProductFactory extends Factory
             'name' => $this->faker->words(2, true),
             'price' => $this->faker->randomDigitNotZero(),
             'quantity' => $this->faker->randomDigitNotZero(),
-            'description' => $this->faker->words(5, true),
+            'description' => Str::substr($this->faker->paragraphs(5, true), 0, 50),
         ];
     }
 }

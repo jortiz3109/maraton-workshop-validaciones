@@ -5,7 +5,7 @@
             <div class="row">
                 <div class="col-md-8">
                     <div class="card card-default mb-3">
-                        <div class="card-header">{{ trans('admin.products.titles.create') }}</div>
+                        <div class="card-header">{{ $product->name }}</div>
                         <div class="card-body">
                             <div class="mb-3">
                                 <h4>{{ trans('admin.products.fields.code') }}</h4>

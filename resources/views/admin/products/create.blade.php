@@ -44,7 +44,7 @@
 
                             <div class="mb-3">
                                 <label for="description" class="form-label">{{ trans('admin.products.fields.description') }}</label>
-                                <textarea class="form-control" name="description" id="description" cols="30" rows="10" required>{{ old('description') }}</textarea>
+                                <textarea @class(['form-control', 'is-invalid' => $errors->has('description')]) name="description" id="description" cols="30" rows="10" required>{{ old('description') }}</textarea>
                                 @error('description')
                                 <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -57,16 +57,17 @@
                     <div class="card card-default mb-3">
                         <div class="card-header">{{ trans('admin.products.fields.images') }}</div>
                         <div class="card-body">
-                    <span class="float-end">
-                        <button @click="$emit('add-image')" type="button" class="btn btn-sm btn-success">{{ trans('add') }}</button>
-                        <button @click="$emit('remove-image')" type="button" class="btn btn-sm btn-danger">{{ trans('remove') }}</button>
-                        <button @click="$emit('remove-all-images')" type="button" class="btn btn-sm btn-danger">{{ trans('remove all') }}</button>
-                    </span>
+                            <div class="float-end">
+                                <button @click="$emit('add-image')" type="button" class="btn btn-sm btn-success">{{ trans('add') }}</button>
+                                <button @click="$emit('remove-image')" type="button" class="btn btn-sm btn-danger">{{ trans('remove') }}</button>
+                                <button @click="$emit('remove-all-images')" type="button" class="btn btn-sm btn-danger">{{ trans('remove all') }}</button>
+                            </div>
                         </div>
-                        <input-file field-label="{{ trans('admin.products.fields.image') }}" field-name="images"></input-file>
-                        @error('images')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                        <input-file field-label="{{ trans('admin.products.fields.image') }}" field-name="images" @error('images.*') css-class="is-invalid" @enderror>
+                            @error('images.*')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                        </input-file>
                     </div>
                 </div>
             </div>
